@@ -60,7 +60,11 @@ function Set-RegistryForUser
             $path = $path + $instance.Path;
             if (!(Test-Path $path)) { New-Item -Path $path -Force > $null; }
             New-ItemProperty -Path $path -Name $instance.Name -PropertyType $instance.Type -Value $instance.Value -Force > $null;
-            Write-Host "... $($instance.Description)";
+
+            if (!($instance.Description -eq ''))
+            {
+                Write-Host "... $($instance.Description)";
+            }
         }
 
         Write-Host "* Modificados registros en perfil $TARGET_USER";
@@ -167,38 +171,38 @@ $UnlockUser = {
 
 $CreateShortcuts = {
 
-        $shortcuts = @(
-                @{ "LinkName" = "MyLink1"; "TargetPath" = "C:\My\Path\To\The\Target\file.exe"; "Description" = "My Awesome Shortcut" },
-                @{ "LinkName" = "MyLink2"; "TargetPath" = "C:\My\Path\To\The\Target\file.exe"; "Description" = "My Awesome Shortcut" }
-            );
+    $shortcuts = @(
+            @{ "LinkName" = "MyLink1"; "TargetPath" = "C:\My\Path\To\The\Target\file.exe"; "Description" = "My Awesome Shortcut" },
+            @{ "LinkName" = "MyLink2"; "TargetPath" = "C:\My\Path\To\The\Target\file.exe"; "Description" = "My Awesome Shortcut" }
+        );
 
-        Write-Host "# Creando accesos directos en el escritorio del usuario $TARGET_USER ..." -BackgroundColor blue -ForegroundColor white;
-        Write-Host "`n";
+    Write-Host "# Creando accesos directos en el escritorio del usuario $TARGET_USER ..." -BackgroundColor blue -ForegroundColor white;
+    Write-Host "`n";
 
-        foreach ($lnk in $shortcuts)
-        {
-            try {
-                $Shell = New-Object -ComObject ("WScript.Shell")
-                $ShortCut = $Shell.CreateShortcut("C:\Users\$TARGET_USER\Desktop\$($lnk.LinkName).lnk")
-                $ShortCut.TargetPath = $lnk.TargetPath
-                $ShortCut.WorkingDirectory = Split-Path -parent $lnk.TargetPath;
-                $ShortCut.WindowStyle = 1;
-                $ShortCut.Description = $lnk.Description;
+    foreach ($lnk in $shortcuts)
+    {
+        try {
+            $Shell = New-Object -ComObject ("WScript.Shell")
+            $ShortCut = $Shell.CreateShortcut("C:\Users\$TARGET_USER\Desktop\$($lnk.LinkName).lnk")
+            $ShortCut.TargetPath = $lnk.TargetPath
+            $ShortCut.WorkingDirectory = Split-Path -parent $lnk.TargetPath;
+            $ShortCut.WindowStyle = 1;
+            $ShortCut.Description = $lnk.Description;
 
-                if ($lnk.Icon -eq '')
-                {
-                    $ShortCut.IconLocation = "$($lnk.TargetPath), 0";
-                } else {
-                    $ShortCut.IconLocation = "$($lnk.Icon), 0";
-                }
-
-                $ShortCut.Save();
-                Write-Host "... Creado link $($lnk.LinkName)";
-                Write-Host "`n";
-            } catch { 
-                Write-Warning -Message $_.Exception.Message 
+            if ($lnk.Icon -eq '')
+            {
+                $ShortCut.IconLocation = "$($lnk.TargetPath), 0";
+            } else {
+                $ShortCut.IconLocation = "$($lnk.Icon), 0";
             }
+
+            $ShortCut.Save();
+            Write-Host "... Creado link $($lnk.LinkName)";
+            Write-Host "`n";
+        } catch { 
+            Write-Warning -Message $_.Exception.Message 
         }
+    }
 }
 
 $CreateFirewallRules = {
@@ -255,7 +259,6 @@ do
         {
             '1' {
                 cls
-                
                 &$CreateShortcuts
             }
             '2' {
@@ -274,7 +277,7 @@ do
                 Write-Host "`n";
                 Write-Host -NoNewLine '[Presione una tecla para finalizar]' -BackgroundColor yellow -ForegroundColor black;
                 $null = $Host.UI.RawUI.ReadKey('NoEcho,IncludeKeyDown');
-                return
+                return;
             }
         }
     } catch {
@@ -282,6 +285,5 @@ do
     }
 
     pause
-}
-until ($input -eq 'q')
+} until ($input -eq 'q')
 
