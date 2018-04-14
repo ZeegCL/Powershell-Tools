@@ -1,2 +1,3 @@
-# PS-BlockThisUser
-Powershell script to restrict features for a user in your Windows PC
+#Powershell-Tools
+
+Various scripts to help you solve some troubles with your Windows PC

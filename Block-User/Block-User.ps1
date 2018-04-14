@@ -1,7 +1,7 @@
 <#
     MIT License
 
-    Copyright (c) 2018 José González (0xe62207@gmail.com)
+    Copyright (c) 2018 José González
 
     Permission is hereby granted, free of charge, to any person obtaining a copy
     of this software and associated documentation files (the "Software"), to deal
@@ -37,7 +37,7 @@ function Set-RegistryForUser
     param ( 
         [Parameter(Mandatory=$true)]
         [hashtable[]]$RegistryInstance 
-    ) 
+    )
     try
     { 
         ## Si el usuario es el actual escribir en HKEY_CURRENT_USER, si no en HKU:\UserHive (temp)
